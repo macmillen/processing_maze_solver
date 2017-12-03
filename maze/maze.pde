@@ -3,38 +3,70 @@ import ddf.minim.*;
 Minim minim;
 AudioPlayer player;
 
- int cols;
- int rows;
- int fieldSize;
+int cols;
+int rows;
+int fieldSize;
+float tileSize;
 
-ArrayList<Tile> tiles = new ArrayList<Tile>();
+ArrayList<Tile> tiles;
 
 Thread pathfinder;
-
+PImage maze;
 Finish finish;
+HScrollbar scrollbar;
+Button btnRestart;
+boolean restart = false;
 
-void setup(){
-  minim = new Minim (this);
+synchronized void setup() {
+  background(0);
+  minim = new Minim (this); //<>//
   player = minim.loadFile ("music.mp3");
-  PImage maze = loadImage("maze_2.png");
+  maze = loadImage("maze_11.png");
+  tiles = new ArrayList<Tile>();
   cols = maze.width;
   rows = maze.height;
   fieldSize = cols * rows;
-  
-  noStroke();
-  surface.setSize(cols * Tile.size, rows * Tile.size);
-  
-  for(int i = 0; i < cols * rows; ++i){
-    tiles.add(new Tile(i % cols, i / rows, maze.get(i % cols, i / rows) + 1));
-  }
+  tileSize = 700.0 / rows;
+
+  surface.setSize(int(cols * tileSize) + 100, int(rows * tileSize) + 20);
+  scrollbar = new HScrollbar(width / 2 - width / 4, height - 12, width / 2, 16, 3);
+  btnRestart = new Button(width - 0, 50, 80, true);
+  finish = new Finish();
+  generateTiles();
   pathfinder = new Pathfinder();
   pathfinder.start();
 }
 
-void draw(){
-  for(int i = 0; i < fieldSize; ++i){
-    tiles.get(i).draw();
+void generateTiles(){
+  for (int i = 0; i < fieldSize; ++i) {
+    tiles.add(new Tile(i % cols, i / cols, maze.get(i % cols, i / cols) + 1));
   }
-  if(finish != null)
+}
+
+synchronized void init(){
+  tiles.clear();
+  generateTiles();
+  ((Pathfinder)pathfinder).init();
+}
+
+void draw() {
+  //clear();
+  noStroke();
+  for (Tile t : tiles) {
+    t.draw();
+  }
+  if (((Pathfinder)pathfinder).stopped){
     finish.draw();
+    
+  }
+  scrollbar.update();
+  scrollbar.display();
+  btnRestart.draw();
+  
+}
+
+void mousePressed(){
+  if(btnRestart.rectOver) {
+    init();
+  } //<>//
 }

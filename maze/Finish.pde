@@ -15,10 +15,10 @@ class Finish {
     for (Word popUp : popUps) {
       popUp.size += 0.7;
       popUp.draw();
-      if(popUp.size > random(50, 100)){
+      if (popUp.size > random(50, 100)) {
         popUp.size = 1;
         popUp.x = random(0, width);
-        popUp.y = random(0,height);
+        popUp.y = random(0, height);
       }
     }
   }
@@ -35,7 +35,7 @@ class Word {
     this.size = size;
     x = random(0, width);
     y = random(0, height);
-    col = color(random(0,255),random(0,255),random(0,255));
+    col = color(random(0, 255), random(0, 255), random(0, 255));
   }
 
   void draw() {
