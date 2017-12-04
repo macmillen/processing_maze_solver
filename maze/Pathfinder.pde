@@ -1,18 +1,24 @@
-class Pathfinder extends Thread { 
+class Pathfinder extends Thread {  //<>//
   Tile firstTile;
   Tile currentTile;
   public long speed = 5;
   boolean stopped;
+  boolean noPathFound;
 
   final int[][] DIRECTIONS = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}}; // N, E, S, W
 
   void run() {  
     init();
     check(currentTile);
-    stopped = true;
+    if (!stopped) {
+      tileTimer = millis();
+      noPathFound = true;
+      player2.play();
+      finish = new Finish(true);
+    }
   }
-  
-  synchronized void init(){
+
+  synchronized void init() {
     findFirstTile();
     currentTile = new Tile(firstTile.x, firstTile.y, 0);
   }
@@ -31,7 +37,7 @@ class Pathfinder extends Thread {
     speed = (long) scrollbar.getPos();
     for (int i = 0; i < DIRECTIONS.length; ++i) {
       if (stopped)
-        return; //<>//
+        return;
       int pos = newPos(currentTile, (int) DIRECTIONS[i][0], (int) DIRECTIONS[i][1]);
       if (tileIsWalkable(pos)) {
         try {
@@ -51,9 +57,11 @@ class Pathfinder extends Thread {
       }
     }
     tiles.get(newPos(currentTile, 0, 0)).deadEnd = true;
-    try{
+    try {
       sleep(speed);
-    }catch(Exception e){}
+    }
+    catch(Exception e) {
+    }
   }
   int newPos(Tile currentTile, int xOffset, int yOffset) {
     return (int) (currentTile.x + xOffset + (currentTile.y + yOffset) * cols);
